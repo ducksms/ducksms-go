@@ -1,0 +1,1306 @@
+openapi: 3.0.2
+info:
+  contact:
+    email: support@ducksms.com
+    name: Support
+    url: https://ducksms.com/
+  description: Ducksms is a leading SMS messaging service provider offering one-way
+    SMS communication services from your internet enabled computer. The API allow
+    you to directly communicate and manage a SMS with our SMS gateway system.
+  title: Ducksms
+  version: 1.0.0
+servers:
+- url: https://ducksms.com
+security:
+- BearerToken: []
+tags:
+- description: Sender ID
+  name: Sender ID
+- description: Sent or schedule a sms
+  name: Sms
+- description: Credits
+  name: Credit
+paths:
+  /api/v1/sms/send:
+    post:
+      description: Create a new sms
+      operationId: SmsSend
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsSchema'
+        description: Create a new sms
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewSmsSend'
+          description: Sms preview
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedSmsSend'
+          description: Sms created
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorValidation'
+          description: Validation errors
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Send Sms
+      tags:
+      - Sms
+  /api/v1/sms/scheduled:
+    get:
+      description: List all the sms schedule
+      operationId: ListSmsSchedule
+      parameters:
+      - description: Page number
+        example: 1
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by sender id name
+        example: DUCKSMS
+        explode: true
+        in: query
+        name: filter[sender_name]
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by sms type
+        example: quick
+        explode: true
+        in: query
+        name: filter[type]
+        required: false
+        schema:
+          enum:
+          - quick
+          - bulk
+          type: string
+        style: form
+      - description: Filter by sms message type
+        example: ascii
+        explode: true
+        in: query
+        name: filter[message_type]
+        required: false
+        schema:
+          enum:
+          - ascii
+          - unicode
+          type: string
+        style: form
+      - description: Filter by sms status
+        example: pending
+        explode: true
+        in: query
+        name: filter[status]
+        required: false
+        schema:
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          - cancelled
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSmsSchedule'
+          description: List all the sms schedule
+          headers:
+            X-Pagination-Count:
+              description: Total data count
+              explode: false
+              schema:
+                example: 50
+                type: integer
+              style: simple
+            X-Pagination-Page:
+              description: Pagination page number
+              explode: false
+              schema:
+                example: 1
+                type: integer
+              style: simple
+            X-Pagination-Limit:
+              description: Pagination limit per page
+              explode: false
+              schema:
+                example: 10
+                type: integer
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: List Sms Schedule
+      tags:
+      - Sms Schedule
+  /api/v1/sms/scheduled/{id}:
+    delete:
+      description: Cancel existing sms schedule
+      operationId: CancelSmsSchedule
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelSmsSchedule'
+          description: Cancel existing sms schedule
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Cancel Sms Schedule
+      tags:
+      - Sms Schedule
+  /api/v1/senders:
+    get:
+      description: List all the senders
+      operationId: ListSender
+      parameters:
+      - description: Page number
+        example: 1
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by sender name
+        example: DUCKSMS
+        explode: true
+        in: query
+        name: filter[name]
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by sender status
+        example: active
+        explode: true
+        in: query
+        name: filter[status]
+        required: false
+        schema:
+          enum:
+          - active
+          - inactive
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSender'
+          description: List all the senders
+          headers:
+            X-Pagination-Count:
+              description: Total data count
+              explode: false
+              schema:
+                example: 50
+                type: integer
+              style: simple
+            X-Pagination-Page:
+              description: Pagination page number
+              explode: false
+              schema:
+                example: 1
+                type: integer
+              style: simple
+            X-Pagination-Limit:
+              description: Pagination limit per page
+              explode: false
+              schema:
+                example: 10
+                type: integer
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: List Sender ID
+      tags:
+      - Sender ID
+    post:
+      description: Create a new sender id
+      operationId: CreateSender
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sender'
+        description: Create a new sender
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedSender'
+          description: Sender ID created
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorValidation'
+          description: Validation errors
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Create a Sender ID
+      tags:
+      - Sender ID
+  /api/v1/senders/{id}:
+    delete:
+      description: Delete an existing sender id
+      operationId: DeleteSender
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletedSender'
+          description: Sender deleted
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Delete a Sender ID
+      tags:
+      - Sender ID
+    get:
+      description: Get details on a single sender id
+      operationId: GetSender
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSender'
+          description: Get details on a single sender
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Get a single Sender ID
+      tags:
+      - Sender ID
+    post:
+      description: Update an existing sender id
+      operationId: UpdateSender
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sender'
+        description: Update an existing sender id
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatedSender'
+          description: Sender updated
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorValidation'
+          description: Validation errors
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Update a Sender ID
+      tags:
+      - Sender ID
+  /api/v1/credits/balance:
+    get:
+      description: Get available credit balance
+      operationId: CreditBalance
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBalance'
+          description: Get available credit balance
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Credit Balance
+      tags:
+      - Credit
+  /api/v1/credits/history:
+    get:
+      description: Get all credit history
+      operationId: CreditHistory
+      parameters:
+      - description: Page number
+        example: 1
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by credit type
+        example: credit
+        explode: true
+        in: query
+        name: filter[type]
+        required: false
+        schema:
+          enum:
+          - credit
+          - charge
+          - pending
+          - freeze
+          - bonus
+          type: string
+        style: form
+      - description: Filter by sms id
+        example: 1009771270
+        explode: true
+        in: query
+        name: filter[sms.smsid]
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditHistory'
+          description: List all the credit history
+          headers:
+            X-Pagination-Count:
+              description: Total data count
+              explode: false
+              schema:
+                example: 50
+                type: integer
+              style: simple
+            X-Pagination-Page:
+              description: Pagination page number
+              explode: false
+              schema:
+                example: 1
+                type: integer
+              style: simple
+            X-Pagination-Limit:
+              description: Pagination limit per page
+              explode: false
+              schema:
+                example: 10
+                type: integer
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidRequest'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+          description: Unauthenticated
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotFound'
+          description: No data found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorException'
+          description: Server error
+      summary: Credit History
+      tags:
+      - Credit
+components:
+  responses:
+    ListSmsSchedule:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListSmsSchedule'
+      description: List all the sms schedule
+      headers:
+        X-Pagination-Count:
+          description: Total data count
+          explode: false
+          schema:
+            example: 50
+            type: integer
+          style: simple
+        X-Pagination-Page:
+          description: Pagination page number
+          explode: false
+          schema:
+            example: 1
+            type: integer
+          style: simple
+        X-Pagination-Limit:
+          description: Pagination limit per page
+          explode: false
+          schema:
+            example: 10
+            type: integer
+          style: simple
+    ErrorException:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorException'
+      description: Server error
+    GetSender:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetSender'
+      description: Get details on a single sender
+    PreviewSmsSend:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PreviewSmsSend'
+      description: Sms preview
+    ErrorUnauthenticated:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorUnauthenticated'
+      description: Unauthenticated
+    ListSender:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListSender'
+      description: List all the senders
+      headers:
+        X-Pagination-Count:
+          description: Total data count
+          explode: false
+          schema:
+            example: 50
+            type: integer
+          style: simple
+        X-Pagination-Page:
+          description: Pagination page number
+          explode: false
+          schema:
+            example: 1
+            type: integer
+          style: simple
+        X-Pagination-Limit:
+          description: Pagination limit per page
+          explode: false
+          schema:
+            example: 10
+            type: integer
+          style: simple
+    UpdatedSender:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdatedSender'
+      description: Sender updated
+    CreditBalance:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreditBalance'
+      description: Get available credit balance
+    CreatedSmsSend:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedSmsSend'
+      description: Sms created
+    ErrorValidation:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorValidation'
+      description: Validation errors
+    CreatedSender:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedSender'
+      description: Sender ID created
+    ErrorNotFound:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorNotFound'
+      description: No data found
+    ErrorInvalidRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInvalidRequest'
+      description: Invalid request
+    CancelSmsSchedule:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CancelSmsSchedule'
+      description: Cancel existing sms schedule
+    DeletedSender:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeletedSender'
+      description: Sender deleted
+    CreditHistory:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreditHistory'
+      description: List all the credit history
+      headers:
+        X-Pagination-Count:
+          description: Total data count
+          explode: false
+          schema:
+            example: 50
+            type: integer
+          style: simple
+        X-Pagination-Page:
+          description: Pagination page number
+          explode: false
+          schema:
+            example: 1
+            type: integer
+          style: simple
+        X-Pagination-Limit:
+          description: Pagination limit per page
+          explode: false
+          schema:
+            example: 10
+            type: integer
+          style: simple
+  schemas:
+    Sender:
+      example:
+        default: false
+        name: DUCKSMS
+        description: Ducksms sender id
+        status: active
+      properties:
+        name:
+          description: Sender name
+          example: DUCKSMS
+          type: string
+        description:
+          description: Sender description
+          example: Ducksms sender id
+          type: string
+        default:
+          description: Default sender id
+          example: false
+          type: boolean
+        status:
+          description: Sender id status
+          enum:
+          - active
+          - inactive
+          example: active
+          type: string
+      type: object
+    SmsSchema:
+      example:
+        preview: "yes"
+        callback_url: https://webhook.site/2a88e4b4-56f7-46ee-b3a4-2f05d8b8456e
+        mobile_numbers:
+        - "60121234567"
+        - "60131234567"
+        - "60141234567"
+        - "60151234567"
+        - "60161234567"
+        - "60171234567"
+        - "60181234567"
+        scheduled_at: 2022-12-06T15:19
+        message: Hello world
+        sender_id: DUCKSMS
+      properties:
+        preview:
+          description: Preview the sms information
+          enum:
+          - "yes"
+          - "no"
+          example: "yes"
+          type: string
+        mobile_numbers:
+          example:
+          - "60121234567"
+          - "60131234567"
+          - "60141234567"
+          - "60151234567"
+          - "60161234567"
+          - "60171234567"
+          - "60181234567"
+          items:
+            type: string
+          nullable: true
+          type: array
+        message:
+          example: Hello world
+          nullable: true
+          type: string
+        sender_id:
+          example: DUCKSMS
+          nullable: true
+          type: string
+        scheduled_at:
+          example: 2022-12-06T15:19
+          nullable: true
+          type: string
+        callback_url:
+          example: https://webhook.site/2a88e4b4-56f7-46ee-b3a4-2f05d8b8456e
+          nullable: true
+          type: string
+      type: object
+    PreviewSmsSend:
+      example:
+        data:
+          scheduled_at: false
+          sender_id:
+            name: DUCKSMS
+          mobile_number:
+          - number: 60131234567
+          - number: 60131234562
+          credit:
+            charge_per_sms: 1
+            charge_per_number: 1
+            charge: 1
+            balance: 986762
+            after: 986761
+          message:
+            type: ascii
+            total: 1
+            length: 31
+            message: 'RM0 DUCKSMS: Hello World, Good morning!'
+          callback_url: https://webhook.site/2a88e4b4-56f7-46ee-b3a4-2f05d8b8456e
+          contains_special_characters: false
+        message: Preview data return successfully
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Preview data return successfully
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          example:
+            scheduled_at: false
+            sender_id:
+              name: DUCKSMS
+            mobile_number:
+            - number: 60131234567
+            - number: 60131234562
+            credit:
+              charge_per_sms: 1
+              charge_per_number: 1
+              charge: 1
+              balance: 986762
+              after: 986761
+            message:
+              type: ascii
+              total: 1
+              length: 31
+              message: 'RM0 DUCKSMS: Hello World, Good morning!'
+            callback_url: https://webhook.site/2a88e4b4-56f7-46ee-b3a4-2f05d8b8456e
+            contains_special_characters: false
+          type: object
+    CreatedSmsSend:
+      properties:
+        status:
+          example: 201
+          type: integer
+        message:
+          example: The sms message is successfully scheduled
+          type: string
+        data:
+          additionalProperties:
+            items:
+              example: "5006623151"
+              type: string
+            type: array
+          example:
+            smsid: "5006623151"
+            scheduled_at: false
+            sender_id:
+              name: DUCKSMS
+            mobile_number:
+            - number: "60131234567"
+              msgid: 2006553122
+            - number: "60131234562"
+              msgid: 7006553121
+            credit:
+              charge_per_sms: 1
+              charge_per_number: 1
+              charge: 1
+              balance: 986762
+              after: 986761
+            message:
+              type: ascii
+              total: 1
+              length: 31
+              message: 'RM0 DUCKSMS: Hello World, Good morning!'
+            callback_url: https://webhook.site/2a88e4b4-56f7-46ee-b3a4-2f05d8b8456e
+            contains_special_characters: false
+          type: object
+    ErrorInvalidRequest:
+      properties:
+        status:
+          example: 400
+          type: integer
+        message:
+          example: Invalid request
+          type: string
+    ErrorUnauthenticated:
+      properties:
+        status:
+          example: 403
+          type: integer
+        message:
+          example: Unauthenticated
+          type: string
+    ErrorValidation:
+      properties:
+        status:
+          example: 422
+          type: integer
+        message:
+          example: The given data was invalid.
+          type: string
+        errors:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          example:
+            field:
+            - Something is wrong with the field
+          type: object
+    ErrorException:
+      properties:
+        status:
+          example: 500
+          type: integer
+        message:
+          example: An error occurred while saving the data
+          type: string
+    ListSmsSchedule:
+      example:
+        data:
+        - smsid: "59961854"
+          type: quick
+          scheduled_at: 2022-12-04 13:41:00
+          sender_name: DUCKSMS
+          message: Hello World
+          recipients: 1
+          status: completed
+          created_at: 2022-12-03 13:40:30
+          updated_at: 2022-12-03 13:46:20
+        - smsid: "1636438975"
+          type: quick
+          scheduled_at: 2022-12-03 12:34:00
+          sender_name: MYCOMPANY
+          message: Hi john
+          recipients: 1
+          status: cancelled
+          created_at: 2022-12-03 12:32:42
+          updated_at: 2022-12-03 12:32:46
+        message: The sms scheduled return successfully
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: The sms scheduled return successfully
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          example:
+          - smsid: "59961854"
+            type: quick
+            scheduled_at: 2022-12-04 13:41:00
+            sender_name: DUCKSMS
+            message: Hello World
+            recipients: 1
+            status: completed
+            created_at: 2022-12-03 13:40:30
+            updated_at: 2022-12-03 13:46:20
+          - smsid: "1636438975"
+            type: quick
+            scheduled_at: 2022-12-03 12:34:00
+            sender_name: MYCOMPANY
+            message: Hi john
+            recipients: 1
+            status: cancelled
+            created_at: 2022-12-03 12:32:42
+            updated_at: 2022-12-03 12:32:46
+          type: object
+    ErrorNotFound:
+      properties:
+        status:
+          example: 404
+          type: integer
+        message:
+          example: No data found
+          type: string
+    CancelSmsSchedule:
+      example:
+        data: []
+        message: Schedule successfully cancelled
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Schedule successfully cancelled
+          type: string
+        data:
+          additionalProperties:
+            type: object
+          example: []
+          type: object
+    ListSender:
+      example:
+        data:
+        - id: 1
+          name: DUCKSMS
+          description: Example sender id description
+          default: true
+          status: active
+          created_at: 2022-11-29T03:28:39.000000Z
+          updated_at: 2022-11-29T03:28:39.000000Z
+        - id: 2
+          name: MYCOMPANY
+          description: Example sender id description
+          default: false
+          status: inactive
+          created_at: 2022-11-30T03:28:39.000000Z
+          updated_at: 2022-11-30T03:28:39.000000Z
+        message: Senders data return successfully
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Senders data return successfully
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          example:
+          - id: 1
+            name: DUCKSMS
+            description: Example sender id description
+            default: true
+            status: active
+            created_at: 2022-11-29T03:28:39.000000Z
+            updated_at: 2022-11-29T03:28:39.000000Z
+          - id: 2
+            name: MYCOMPANY
+            description: Example sender id description
+            default: false
+            status: inactive
+            created_at: 2022-11-30T03:28:39.000000Z
+            updated_at: 2022-11-30T03:28:39.000000Z
+          type: object
+    CreatedSender:
+      example:
+        data:
+          id: 1
+        message: Sender successfully created
+        status: 201
+      properties:
+        status:
+          example: 201
+          type: integer
+        message:
+          example: Sender successfully created
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          example:
+            id: 1
+          type: object
+    GetSender:
+      example:
+        data:
+          id: 1
+          name: DUCKSMS
+          description: Example sender id description
+          default: true
+          status: active
+          created_at: 2022-11-29T03:28:39.000000Z
+          updated_at: 2022-11-29T03:28:39.000000Z
+        message: Sender data return successfully
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Sender data return successfully
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          example:
+            id: 1
+            name: DUCKSMS
+            description: Example sender id description
+            default: true
+            status: active
+            created_at: 2022-11-29T03:28:39.000000Z
+            updated_at: 2022-11-29T03:28:39.000000Z
+          type: object
+    UpdatedSender:
+      example:
+        data: []
+        message: Sender successfully updated
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Sender successfully updated
+          type: string
+        data:
+          additionalProperties:
+            type: object
+          example: []
+          type: object
+    DeletedSender:
+      example:
+        data: []
+        message: Sender successfully deleted
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Sender successfully deleted
+          type: string
+        data:
+          additionalProperties:
+            type: object
+          example: []
+          type: object
+    CreditBalance:
+      example:
+        data:
+          balance: 986762
+        message: Balance return successfully
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Balance return successfully
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          example:
+            balance: 986762
+          type: object
+    CreditHistory:
+      example:
+        data:
+        - txid: "342660487"
+          type: charge
+          amount: 1
+          description: SMS credit charge
+          smsid: "1201910908"
+        - txid: "1220368389"
+          type: charge
+          amount: 2
+          description: SMS credit charge
+          smsid: "634967613"
+        message: Credit history data return successfully
+        status: 200
+      properties:
+        status:
+          example: 200
+          type: integer
+        message:
+          example: Credit history data return successfully
+          type: string
+        data:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          example:
+          - txid: "342660487"
+            type: charge
+            amount: 1
+            description: SMS credit charge
+            smsid: "1201910908"
+          - txid: "1220368389"
+            type: charge
+            amount: 2
+            description: SMS credit charge
+            smsid: "634967613"
+          type: object
+  securitySchemes:
+    BearerToken:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
